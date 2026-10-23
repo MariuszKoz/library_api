@@ -1,0 +1,31 @@
+# syntax=docker/dockerfile:1
+
+# Development image for docker compose (see compose.yaml). Not used for production - see Dockerfile.
+ARG RUBY_VERSION=3.4.7
+FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+# Match the host user so files created in the bind-mounted app dir are not owned by root
+ARG UID=1000
+ARG GID=1000
+
+WORKDIR /rails
+
+# Install packages needed to build gems and run the app
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libvips libyaml-dev pkg-config postgresql-client curl && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+ENV BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_JOBS="4"
+
+RUN groupadd --gid $GID rails && \
+    useradd rails --uid $UID --gid $GID --create-home --shell /bin/bash && \
+    chown -R rails:rails /rails "${BUNDLE_PATH}"
+USER rails
+
+# Install gems at build time; the bundle volume keeps them between container runs
+COPY --chown=rails:rails Gemfile Gemfile.lock ./
+RUN bundle install
+
+EXPOSE 3000
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]

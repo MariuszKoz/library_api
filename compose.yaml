@@ -1,0 +1,45 @@
+# Local development environment. Usage: see docs/development/docker_compose.md
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      # Bound to localhost only; 5433 by default to avoid clashing with a local PostgreSQL
+      - "127.0.0.1:${DB_HOST_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    # Install gems added after the image was built, drop a stale pid, prepare the database, start the server
+    command: bash -c "bundle check > /dev/null || bundle install; rm -f tmp/pids/server.pid && bin/rails db:prepare && bin/rails server -b 0.0.0.0"
+    environment:
+      # No database name in the path on purpose: names come from config/database.yml per env,
+      # so development and test stay separate databases
+      DATABASE_URL: postgres://${DB_USERNAME:-postgres}:${DB_PASSWORD:-postgres}@db:5432
+    ports:
+      - "${WEB_HOST_PORT:-3000}:3000"
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+    depends_on:
+      db:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
+  bundle:
