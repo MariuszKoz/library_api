@@ -57,7 +57,7 @@ Model-only rules (not enforced by the database): blank strings in `name`, `title
 case-insensitive email uniqueness (the unique index is case-sensitive, `normalizes` downcases the email).
 
 Two concurrent borrowings of the same book can both pass the uniqueness validation; the partial index then
-raises `ActiveRecord::RecordNotUnique`, which the calling code must handle.
+raises `ActiveRecord::RecordNotUnique`. `Books::BorrowingsController` rescues it and returns `422`
 
 ## Assumptions (to confirm)
 
