@@ -67,7 +67,3 @@ raises `ActiveRecord::RecordNotUnique`, which the calling code must handle.
 - `Date.current` uses the application time zone; `config.time_zone` is not set yet (UTC).
 - One active borrowing per book: a serial number identifies one physical copy.
 - No limit on how many books one reader can borrow at a time.
-
-## Out of scope
-
-API endpoints, borrowing/return actions, overdue handling.

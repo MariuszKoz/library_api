@@ -32,6 +32,20 @@ RSpec.describe Book do
     expect(book.errors).to include(:title, :author)
   end
 
+  describe "#status" do
+    it "is borrowed while the book has an active borrowing" do
+      expect(books(:dune).status).to eq("borrowed")
+    end
+
+    it "is available when all borrowings were returned" do
+      expect(books(:solaris).status).to eq("available")
+    end
+
+    it "is available without borrowings" do
+      expect(books(:hobbit).status).to eq("available")
+    end
+  end
+
   describe "#destroy" do
     it "is blocked while the book has borrowings" do
       expect(books(:solaris).destroy).to be(false)
