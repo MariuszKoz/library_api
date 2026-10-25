@@ -23,7 +23,7 @@ docker compose logs -f web             # server log
 
 docker compose exec web bin/rails console
 docker compose exec web bin/rails db:migrate
-docker compose run --rm -e RAILS_ENV=test web bin/rails db:prepare test
+docker compose run --rm -e RAILS_ENV=test web bash -c "bundle exec rspec"
 
 docker compose down                    # stop, keep data
 docker compose down -v                 # stop and DELETE database data and installed gems

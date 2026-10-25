@@ -10,8 +10,46 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 0) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_23_140558) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "books", force: :cascade do |t|
+    t.string "serial_number", null: false
+    t.string "title", null: false
+    t.string "author", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["serial_number"], name: "index_books_on_serial_number", unique: true
+    t.check_constraint "serial_number::text ~ '^[0-9]{6}$'::text", name: "books_serial_number_format"
+  end
+
+  create_table "borrowings", force: :cascade do |t|
+    t.bigint "reader_id", null: false
+    t.bigint "book_id", null: false
+    t.date "borrowed_on", null: false
+    t.date "due_on", null: false
+    t.date "returned_on"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["book_id"], name: "index_borrowings_on_book_id"
+    t.index ["book_id"], name: "index_borrowings_on_book_id_active", unique: true, where: "(returned_on IS NULL)"
+    t.index ["reader_id"], name: "index_borrowings_on_reader_id"
+    t.check_constraint "due_on > borrowed_on", name: "borrowings_due_after_borrowed"
+    t.check_constraint "returned_on IS NULL OR returned_on >= borrowed_on", name: "borrowings_returned_not_before_borrowed"
+  end
+
+  create_table "readers", force: :cascade do |t|
+    t.string "card_number", null: false
+    t.string "name", null: false
+    t.string "email", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["card_number"], name: "index_readers_on_card_number", unique: true
+    t.index ["email"], name: "index_readers_on_email", unique: true
+    t.check_constraint "card_number::text ~ '^[0-9]{6}$'::text", name: "readers_card_number_format"
+  end
+
+  add_foreign_key "borrowings", "books"
+  add_foreign_key "borrowings", "readers"
 end

@@ -1,0 +1,9 @@
+alice:
+  card_number: "100001"
+  name: Alice Nowak
+  email: alice@example.com
+
+bob:
+  card_number: "100002"
+  name: Bob Wisniewski
+  email: bob@example.com

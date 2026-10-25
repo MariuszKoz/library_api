@@ -1,0 +1,14 @@
+dune:
+  serial_number: "200001"
+  title: Dune
+  author: Frank Herbert
+
+solaris:
+  serial_number: "200002"
+  title: Solaris
+  author: Stanislaw Lem
+
+hobbit:
+  serial_number: "200003"
+  title: The Hobbit
+  author: J.R.R. Tolkien
