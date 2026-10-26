@@ -97,3 +97,15 @@ ls tmp/mails/
 ```
 
 Email previews: http://localhost:3000/rails/mailers. More: [docs/features/borrowing_reminders.md](docs/features/borrowing_reminders.md).
+
+## Why Solid Queue
+
+I considered Sidekiq, but went with Solid Queue:
+
+- it uses the PostgreSQL the app already has, so there is no Redis to run and maintain,
+- recurring jobs are built in (`config/recurring.yml`), Sidekiq would need an extra gem like sidekiq-cron,
+- it runs inside the Rails server (`SOLID_QUEUE_IN_PUMA`), so there is no separate worker container,
+- it's the Rails 8 default.
+
+For one daily job and a few emails this is enough. If there were many more jobs, Sidekiq would be faster, and
+Solid Queue can also be moved to its own process (`bin/jobs`) without changing the code.
