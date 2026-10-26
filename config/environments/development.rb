@@ -38,6 +38,13 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
+  # Write emails to tmp/mails instead of sending them
+  config.action_mailer.delivery_method = :file
+
+  # Run jobs (including recurring ones from config/recurring.yml) with Solid Queue, like in production.
+  config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = { database: { writing: :queue } }
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 

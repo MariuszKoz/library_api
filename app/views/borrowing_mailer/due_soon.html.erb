@@ -1,0 +1,8 @@
+<p>Hello <%= @borrowing.reader.name %>,</p>
+
+<p>
+  the book <strong>"<%= @borrowing.book.title %>"</strong> by <%= @borrowing.book.author %>
+  (serial number <%= @borrowing.book.serial_number %>) is due back on <strong><%= @borrowing.due_on %></strong>.
+</p>
+
+<p>Please return it to the library by then.</p>

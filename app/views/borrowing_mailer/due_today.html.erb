@@ -1,0 +1,9 @@
+<p>Hello <%= @borrowing.reader.name %>,</p>
+
+<p>
+  today (<strong><%= @borrowing.due_on %></strong>) is the last day to return the book
+  <strong>"<%= @borrowing.book.title %>"</strong> by <%= @borrowing.book.author %>
+  (serial number <%= @borrowing.book.serial_number %>).
+</p>
+
+<p>Please return it to the library today.</p>
