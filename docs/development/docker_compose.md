@@ -7,12 +7,13 @@
   runs `bin/rails db:prepare` and starts the server.
 - `Dockerfile.dev` - development image (all gem groups, build tools). The production image is still `Dockerfile`.
 
-`web` connects through `DATABASE_URL=postgres://postgres:postgres@db:5432`. The URL has **no database name** on
-purpose: Rails takes the name from `config/database.yml` for the current env, so `development` and `test` use
-separate databases. Adding a name to the URL would make tests run against (and wipe) the development database.
-
-Background jobs, cache and cable use in-process / memory adapters in development, so only the primary
-database is needed. The `solid_*` databases are production-only.
+- Database connection: `DB_HOST`, `DB_USERNAME`, `DB_PASSWORD` (not `DATABASE_URL`, it doesn't reach the `queue`
+  database).
+- Development databases: `library_api_development` and `library_api_development_queue` (Solid Queue), both
+  created by `bin/rails db:prepare`.
+- Background jobs run inside the Rails server (`SOLID_QUEUE_IN_PUMA=1`), recurring ones are in
+  `config/recurring.yml`.
+- Emails are saved to `tmp/mails/` instead of being sent. Previews: http://localhost:3000/rails/mailers.
 
 ## Usage
 
@@ -42,7 +43,8 @@ After changing `Gemfile`, restart `web` (its command installs missing gems) or r
 | `DB_PASSWORD`   | `postgres` | PostgreSQL password (development only)                        |
 | `UID` / `GID`   | `1000`     | Container user, should match the host user (`id -u`, `id -g`) |
 
-Connect from the host: `psql -h 127.0.0.1 -p 5433 -U postgres library_api_development`.
+Connect from the host: `psql -h 127.0.0.1 -p 5433 -U postgres library_api_development`
+(`library_api_development_queue` for the job queue).
 
 ## Volumes
 
