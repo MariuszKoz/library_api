@@ -26,9 +26,12 @@ services:
     # Install gems added after the image was built, drop a stale pid, prepare the database, start the server
     command: bash -c "bundle check > /dev/null || bundle install; rm -f tmp/pids/server.pid && bin/rails db:prepare && bin/rails server -b 0.0.0.0"
     environment:
-      # No database name in the path on purpose: names come from config/database.yml per env,
-      # so development and test stay separate databases
-      DATABASE_URL: postgres://${DB_USERNAME:-postgres}:${DB_PASSWORD:-postgres}@db:5432
+      # DB_* instead of DATABASE_URL, so the queue database gets the host too
+      DB_HOST: db
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      # Run the Solid Queue supervisor (workers, dispatcher, recurring scheduler) inside Puma
+      SOLID_QUEUE_IN_PUMA: "1"
     ports:
       - "${WEB_HOST_PORT:-3000}:3000"
     volumes:
